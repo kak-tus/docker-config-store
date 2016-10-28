@@ -93,12 +93,13 @@ if [ -n "$list" ]; then
     val=$( printenv | fgrep $var | awk -F '=' '{ print $2 }' )
     echo "Process vault $val"
 
-    exists=$(vault read -field=value $val 2>/dev/null)
-    if [ -z "$exists" ]; then
-      pass=$(< /dev/urandom tr -dc A-Za-z0-9 | head -c${1:-20} )
+    key=$( echo $val | awk -F ';' '{ print $1 }' )
+    pass=$( echo $val | awk -F ';' '{ print $2 }' )
 
+    exists=$(vault read -field=value $key 2>/dev/null)
+    if [ -z "$exists" ]; then
       echo 'Store value'
-      echo -n "$pass" | vault write value=- ttl=86400
+      echo -n "$pass" | vault write $key value=- ttl=86400
 
       if [ $? = 1 ]; then
         echo 'Vault error'
