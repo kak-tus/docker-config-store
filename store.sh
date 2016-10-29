@@ -30,7 +30,7 @@ store_consul_acl() {
   token=$1
   name=$2
 
-  if [ $3=='management' ]; then
+  if [ "$3" = 'management' ]; then
     type="--management"
   else
     type=""
@@ -147,13 +147,13 @@ if [ -n "$CONF_LIST" ]; then
     key_val=$( echo $item | awk -F ';' '{ print $3 }' )
     key_arg=$( echo $item | awk -F ';' '{ print $4 }' )
 
-    if [ $type=='consul' ]; then
+    if [ "$type" = 'consul' ]; then
       status_consul
       store_consul $key $key_val
-    elif [ $type=='consul_acl' ]; then
+    elif [ "$type" = 'consul_acl' ]; then
       status_consul
       store_consul_acl $key $key_val $key_arg
-    elif [ $type=='vault' ]; then
+    elif [ "$type" = 'vault' ]; then
       status_vault
       store_vault $key $key_val
     fi
