@@ -1,5 +1,11 @@
 FROM ciscocloud/consul-cli:0.3.1
 
+ENV CONSUL_HTTP_ADDR=
+ENV CONSUL_TOKEN=
+ENV VAULT_ADDR=
+ENV VAULT_TOKEN=
+ENV CONF_LIST=
+
 COPY store.sh /usr/local/bin/store.sh
 COPY vault_0.6.2_SHA256SUMS /usr/local/bin/vault_0.6.2_SHA256SUMS
 
