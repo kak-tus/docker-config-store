@@ -14,7 +14,7 @@ if [ -n "$list" ]; then
   fi
 
   for var in $list; do
-    val=$( printenv | fgrep $var | awk -F '=' '{ print $2 }' )
+    val=$( printenv $var )
     echo "Process consul $val"
 
     key=$( echo $val | awk -F ';' '{ print $1 }' )
@@ -51,7 +51,7 @@ if [ -n "$list" ]; then
   fi
 
   for var in $list; do
-    val=$( printenv | fgrep $var | awk -F '=' '{ print $2 }' )
+    val=$( printenv $var )
     echo "Process consul ACL $val"
 
     token=$( echo $val | awk -F ';' '{ print $1 }' )
@@ -90,7 +90,7 @@ if [ -n "$list" ]; then
   fi
 
   for var in $list; do
-    val=$( printenv | fgrep $var | awk -F '=' '{ print $2 }' )
+    val=$( printenv $var )
     echo "Process vault $val"
 
     key=$( echo $val | awk -F ';' '{ print $1 }' )
