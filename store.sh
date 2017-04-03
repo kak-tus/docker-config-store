@@ -12,20 +12,14 @@ store_consul() {
 
   echo "Process consul key $key"
 
-  exists=$( $CONSUL_CLI kv read $key 2>/dev/null )
-  if [ -z "$exists" ]; then
-    echo "Store consul key $key"
-    $CONSUL_CLI kv write $key $key_val
+  $CONSUL_CLI kv write $key $key_val
 
-    if [ $? = 1 ]; then
-      echo 'Consul error'
-      exit 1
-    fi
-
-    echo "Stored consul key $key"
-  else
-    echo "Consul key $key exists"
+  if [ $? = 1 ]; then
+    echo 'Consul error'
+    exit 1
   fi
+
+  echo "Stored consul key $key"
 }
 
 store_consul_acl() {
