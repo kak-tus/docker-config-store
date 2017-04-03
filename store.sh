@@ -7,12 +7,12 @@ if [ -n "$CONSUL_TOKEN" ]; then
 fi
 
 store_consul() {
-  key=$1
-  key_val=$2
+  key="$1"
+  key_val="$2"
 
   echo "Process consul key $key"
 
-  $CONSUL_CLI kv write $key $key_val
+  $CONSUL_CLI kv write "$key" "$key_val"
 
   if [ $? = 1 ]; then
     echo 'Consul error'
@@ -98,10 +98,10 @@ if [ -n "$list" ]; then
   status_consul
 
   for var in $list; do
-    val=$( printenv $var )
+    val="$( printenv $var )"
 
-    key=$( echo $val | cut -d ';' -f 1 )
-    key_val=$( echo $val | cut -d ';' -f 2- )
+    key="$( echo $val | cut -d ';' -f 1 )"
+    key_val="$( echo $val | cut -d ';' -f 2- )"
 
     store_consul "$key" "$key_val"
   done
