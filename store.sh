@@ -100,8 +100,8 @@ if [ -n "$list" ]; then
   for var in $list; do
     val="$( printenv $var )"
 
-    key="$( echo $val | cut -d ';' -f 1 )"
-    key_val="$( echo $val | cut -d ';' -f 2- )"
+    key="$( echo "$val" | cut -d ';' -f 1 )"
+    key_val="$( echo "$val" | cut -d ';' -f 2- )"
 
     store_consul "$key" "$key_val"
   done
