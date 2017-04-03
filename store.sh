@@ -1,8 +1,10 @@
 #!/usr/bin/env sh
 
-# Consul
+CONSUL_CLI="consul-cli --consul $CONSUL_HTTP_ADDR"
 
-CONSUL_CLI="consul-cli --consul $CONSUL_HTTP_ADDR --token $CONSUL_TOKEN"
+if [ -n "$CONSUL_TOKEN" ]; then
+  CONSUL_CLI="$CONSUL_CLI --token $CONSUL_TOKEN"
+fi
 
 store_consul() {
   key=$1
@@ -51,8 +53,14 @@ store_consul_acl() {
 store_vault() {
   key=$1
   key_val=$2
+  regex=$3
 
   echo "Process vault key $key"
+
+  if [ -z "$key_val" ]; then
+    key_val=$( /usr/local/bin/random_regex.pl "$regex" )
+    echo "Generate password by regex $regex"
+  fi
 
   exists=$(vault read -field=value $key 2>/dev/null)
   if [ -z "$exists" ]; then
@@ -88,6 +96,8 @@ status_consul() {
   fi
 }
 
+# Consul
+
 list=$( printenv | fgrep CONF_CONSUL_ | awk -F '=' '{ print $1 }' )
 
 if [ -n "$list" ]; then
@@ -99,7 +109,7 @@ if [ -n "$list" ]; then
     key=$( echo $val | awk -F ';' '{ print $1 }' )
     key_val=$( echo $val | awk -F ';' '{ print $2 }' )
 
-    store_consul $key $key_val
+    store_consul "$key" "$key_val"
   done
 fi
 
@@ -117,7 +127,7 @@ if [ -n "$list" ]; then
     name=$( echo $val | awk -F ';' '{ print $2 }' )
     type=$( echo $val | awk -F ';' '{ print $3 }' )
 
-    store_consul_acl $token $name $type
+    store_consul_acl "$token" "$name" "$type"
   done
 fi
 
@@ -133,8 +143,9 @@ if [ -n "$list" ]; then
 
     key=$( echo $val | awk -F ';' '{ print $1 }' )
     pass=$( echo $val | awk -F ';' '{ print $2 }' )
+    regex=$( echo $val | awk -F ';' '{ print $3 }' )
 
-    store_vault $key $pass
+    store_vault "$key" "$pass" "$regex"
   done
 fi
 
@@ -149,15 +160,17 @@ if [ -n "$CONF_LIST" ]; then
 
     if [ "$type" = 'consul' ]; then
       status_consul
-      store_consul $key $key_val
+      store_consul "$key" "$key_val"
     elif [ "$type" = 'consul_acl' ]; then
       status_consul
-      store_consul_acl $key $key_val $key_arg
+      store_consul_acl "$key" "$key_val" "$key_arg"
     elif [ "$type" = 'vault' ]; then
       status_vault
-      store_vault $key $key_val
+      store_vault "$key" "$key_val" "$key_arg"
     fi
   done
 fi
 
-exit 0
+while true; do
+  sleep 5
+done
