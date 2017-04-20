@@ -5,7 +5,7 @@ use warnings;
 use v5.10;
 use utf8;
 
-use Cpanel::JSON::XS qw(encode_json);
+use Cpanel::JSON::XS qw( encode_json decode_json );
 use HTTP::Request;
 use LWP::UserAgent;
 use String::Random qw(random_regex);
@@ -146,12 +146,44 @@ sub store_vault {
   foreach my $val (@vals) {
     say "Store vault key $val->{key}";
 
+    my $url = "${vault}v1/$val->{key}";
+
+    my $req = HTTP::Request->new( 'GET', $url,
+      [ 'X-Vault-Token', $ENV{VAULT_TOKEN} ] );
+
+    my $res = $ua->request($req);
+
+    if ( $res->is_success ) {
+      say 'Key exists';
+      next;
+    }
+    elsif ( $res->code == 404 ) {
+      say 'Can store';
+    }
+    else {
+      say 'Vault store fail';
+      exit;
+    }
+
+    my $decoded = eval { decode_json( $res->decoded_content ) };
+
+    if ($@) {
+      say $@;
+      next;
+    }
+
+    unless ( $decoded
+      && $decoded->{errors}
+      && scalar( @{ $decoded->{errors} } ) == 0 )
+    {
+      say "Have errors, can't store";
+      next;
+    }
+
     unless ( defined $val->{pass} && length $val->{pass} ) {
       $val->{pass} = random_regex( $val->{regex} );
       say "Generate password by regex $val->{regex}";
     }
-
-    my $url = "${vault}v1/$val->{key}";
 
     my %data = (
       value => $val->{pass},
@@ -159,10 +191,10 @@ sub store_vault {
     );
     my $encoded = encode_json( \%data );
 
-    my $req = HTTP::Request->new( 'POST', $url,
+    $req = HTTP::Request->new( 'POST', $url,
       [ 'X-Vault-Token', $ENV{VAULT_TOKEN} ], $encoded );
 
-    my $res = $ua->request($req);
+    $res = $ua->request($req);
 
     unless ( $res->is_success ) {
       say 'Vault store fail';
