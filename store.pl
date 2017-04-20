@@ -53,6 +53,9 @@ sub store {
   if ( $ENV{CONF_LIST} ) {
     my @env = split /\n/, $ENV{CONF_LIST};
     foreach my $item (@env) {
+      $item =~ s/^\s+//;
+      $item =~ s/\s+$//;
+
       my ( $type, $key, $val, $arg ) = split /;/, $item;
       next unless $type;
 
