@@ -96,10 +96,9 @@ sub store_consul {
     say "Store consul key $val->{key}";
 
     my $url = "http://$consul/v1/kv/$val->{key}";
+    my $req = HTTP::Request->new( 'PUT', $url, undef, $val->{val} );
 
-    my $res = $ua->put( $url, Content => $val->{val} );
-
-    unless ( $res->is_success ) {
+    unless ( _request($req) ) {
       say 'Consul store fail';
       exit;
     }
@@ -126,10 +125,9 @@ sub store_consul_acl {
       Type => $val->{type},
     );
     my $encoded = encode_json( \%data );
+    my $req = HTTP::Request->new( 'PUT', $url, undef, $encoded );
 
-    my $res = $ua->put( $url, Content => $encoded );
-
-    unless ( $res->is_success ) {
+    unless ( _request($req) ) {
       say 'Consul store fail';
       exit;
     }
@@ -209,9 +207,9 @@ sub store_vault {
 
 sub status_vault {
   my $url = "${vault}v1/sys/health";
-  my $res = $ua->get($url);
+  my $req = HTTP::Request->new( 'GET', $url );
 
-  unless ( $res->is_success ) {
+  unless ( _request($req) ) {
     say 'Vault status fail';
     exit;
   }
@@ -221,9 +219,9 @@ sub status_vault {
 
 sub status_consul {
   my $url = "http://$consul/v1/status/leader";
-  my $res = $ua->get($url);
+  my $req = HTTP::Request->new( 'GET', $url );
 
-  unless ( $res->is_success ) {
+  unless ( _request($req) ) {
     say 'Consul status fail';
     exit;
   }
@@ -231,3 +229,18 @@ sub status_consul {
   return;
 }
 
+sub _request {
+  my $req = shift;
+
+  for ( 1 .. 5 ) {
+    my $res = $ua->request($req);
+
+    if ( $res->is_success ) {
+      return 1;
+    }
+
+    sleep 1;
+  }
+
+  return;
+}
