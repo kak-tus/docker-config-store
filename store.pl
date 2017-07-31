@@ -242,5 +242,7 @@ sub _request {
     sleep 1;
   }
 
+  say 'Call fail: ' . $res->status_line;
+
   return;
 }
