@@ -232,8 +232,10 @@ sub status_consul {
 sub _request {
   my $req = shift;
 
+  my $res;
+
   for ( 1 .. 5 ) {
-    my $res = $ua->request($req);
+    $res = $ua->request($req);
 
     if ( $res->is_success ) {
       return 1;
