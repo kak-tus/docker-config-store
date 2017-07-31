@@ -234,14 +234,15 @@ sub _request {
 
   my $res;
 
-  for ( 1 .. 5 ) {
+  for ( 1 .. 10 ) {
     $res = $ua->request($req);
 
     if ( $res->is_success ) {
       return 1;
     }
 
-    sleep 1;
+    say 'Retry call';
+    sleep 10;
   }
 
   say 'Call fail: ' . $res->status_line;
