@@ -2,12 +2,12 @@ FROM alpine:edge
 
 RUN \
   echo "@testing http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
-  && apk add --no-cache
+  && apk add --no-cache \
     perl \
     perl-cpanel-json-xs \
     perl-libwww \
-    perl-string-random@testing
-    perl-try-tiny \
+    perl-string-random@testing \
+    perl-try-tiny
 
 ENV CONSUL_HTTP_ADDR=
 ENV CONSUL_TOKEN=
