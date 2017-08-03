@@ -10,6 +10,8 @@ use HTTP::Request;
 use LWP::UserAgent;
 use String::Random qw(random_regex);
 
+$| = 1;
+
 my $ua = LWP::UserAgent->new;
 
 my $consul = $ENV{CONSUL_HTTP_ADDR};
