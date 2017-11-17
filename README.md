@@ -1,3 +1,5 @@
 # docker-config-store
 
-For internal usage
+Deprecated.
+
+It works, but [git2consul](https://github.com/breser/git2consul) is better. I did not know about it before.
